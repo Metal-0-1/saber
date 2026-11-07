@@ -468,8 +468,9 @@ class CanvasGestureDetectorState extends State<CanvasGestureDetector> {
   }
 
   void _detectStylusButton(PointerEvent event) {
-    final pressed =
-        event.buttons == kSecondaryButton || event.kind == .invertedStylus;
+        final pressed =
+        (event.buttons & kSecondaryButton) != 0 ||
+        event.kind == .invertedStylus;
     if (stylusButtonWasPressed != pressed) {
       stylusButtonWasPressed = pressed;
       widget.onStylusButtonChanged(pressed);
