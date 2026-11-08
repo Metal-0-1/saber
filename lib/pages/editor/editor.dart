@@ -824,19 +824,19 @@ class EditorState extends State<Editor> {
   }
 
   void onStylusButtonChanged(bool buttonIsPressed) {
-    stylusButtonWasPressed |= buttonIsPressed;
-
+    // Samsung tablets don't deliver pen touches while the S Pen button is held,
+    // so a button press toggles between the eraser and the previous tool
+    // instead. Releasing the button does nothing.
+    if (!buttonIsPressed) return;
     if (!isHovering) return;
-    if (buttonIsPressed) {
-      // button pressed while hovering, switch to Eraser
-      if (currentTool is! Eraser) {
-        currentTool = Eraser();
-      }
+
+    // Don't auto-restore the previous tool after the first erase stroke
+    stylusButtonWasPressed = false;
+
+    if (currentTool is Eraser) {
+      currentTool = _lastNonEraserTool;
     } else {
-      // button was released while hovering, switch back to non-Eraser
-      if (currentTool is Eraser) {
-        currentTool = _lastNonEraserTool;
-      }
+      currentTool = Eraser();
     }
 
     if (mounted) setState(() {});
